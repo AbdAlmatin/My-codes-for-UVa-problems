@@ -1,0 +1,86 @@
+#include <iostream>
+#include <map>
+#include <vector>
+#include <queue>
+#include <stdio.h>
+#include <cstring>
+#include <limits.h>
+using namespace std;
+int scenario;
+
+vector <int> edge[250];
+vector <int> cost[250];
+bool taken[250];
+
+struct am{
+    int v, weight;
+    bool operator < (const am& p) const{
+        return p.weight > weight;
+    }
+};
+
+int prims(int src, int end){
+    int ans = INT_MAX;
+    priority_queue <am> pq;
+    memset(taken, false, sizeof(taken));
+    while(true){
+        taken[src] = true;
+        for(int i = 0; i < edge[src].size(); i++){
+            int x = edge[src][i];
+            if(!taken[x]){
+                am tmpam;
+                tmpam.v = x, tmpam.weight = cost[src][i];
+                pq.push(tmpam);
+            }
+        }
+        int tmpw = 0;
+        while(taken[src]){
+            am tmpam = pq.top(); pq.pop();
+            tmpw = tmpam.weight;
+            src = tmpam.v;
+        }
+        ans = min(ans, tmpw);
+        if(src == end) return ans;
+    }
+}
+
+int main()
+{   
+  //  freopen ("in.txt", "r", stdin);
+    //freopen ("out.txt", "w", stdout);
+    int city, road;
+    bool check = false;
+    while(cin >> city >> road){
+        if( city == 0 && road == 0 ) break;
+        string city1, city2;
+        int weight;
+        map <string, int> mapp; //given nodes ar city-name i.e. string, need to map with integer.
+        int no = 0; 
+        
+        while (road--)
+        {
+            cin >> city1 >> city2 >> weight;
+            
+            if( mapp[city1] == 0) mapp[city1] = ++no;
+            if( mapp[city2] == 0) mapp[city2] = ++no;
+            edge[ mapp[city1] ].push_back( mapp[city2] );
+            edge[ mapp[city2] ].push_back( mapp[city1] );
+            cost[ mapp[city1] ].push_back(weight);
+            cost[ mapp[city2] ].push_back(weight);
+         //   cout << mapp[city1] << " " << mapp[city2] << "\n";
+        }
+
+        int start, end;
+        cin >> city1 >> city2;
+
+        start = mapp[city1], end = mapp[city2];
+        int ans = prims(start, end);
+        cout << "Scenario #" << ++scenario << "\n";
+        cout << ans << " tons" << "\n";
+        cout << '\n';
+    }
+    
+    return 0;
+}
+
+//using prims algorithm
